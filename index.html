@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+        select, input {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .checkbox-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .counter-container {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background: #333;
+        }
+        .counter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .extra-container {
+            margin-top: 20px;
+        }
+        .extra-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .extra-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #444;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .message-preview {
+            background: #222;
+            color: #ddd;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: left;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #777;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        #contact-text {
+            color: #aaa;
+        }
+        .toggle-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .toggle {
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle.active {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <select id="lang" onchange="updateLanguage()">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="cz">Česky</option>
+        </select>
+    </div>
+    <div class="container">
+        <div class="toggle-group">
+            <div class="toggle" id="p2" onclick="toggleCounter('p2')">P2</div>
+            <div class="toggle" id="p3" onclick="toggleCounter('p3')">P3</div>
+            <div class="toggle" id="p4" onclick="toggleCounter('p4')">P4</div>
+        </div>
+        <div id="p2-container" class="counter-container"><div class="counter"><span>PS</span> <button onclick="changeValue('p2-ps', -1)">-</button> <span id="p2-ps">0</span> <button onclick="changeValue('p2-ps', 1)">+</button></div><div class="counter"><span>ISS</span> <button onclick="changeValue('p2-iss', -1)">-</button> <span id="p2-iss">0</span> <button onclick="changeValue('p2-iss', 1)">+</button></div></div>
+        <div id="p3-container" class="counter-container"><div class="counter"><span>PS</span> <button onclick="changeValue('p3-ps', -1)">-</button> <span id="p3-ps">0</span> <button onclick="changeValue('p3-ps', 1)">+</button></div><div class="counter"><span>ISS</span> <button onclick="changeValue('p3-iss', -1)">-</button> <span id="p3-iss">0</span> <button onclick="changeValue('p3-iss', 1)">+</button></div></div>
+        <div id="p4-container" class="counter-container"><div class="counter"><span>PS</span> <button onclick="changeValue('p4-ps', -1)">-</button> <span id="p4-ps">0</span> <button onclick="changeValue('p4-ps', 1)">+</button></div><div class="counter"><span>ISS</span> <button onclick="changeValue('p4-iss', -1)">-</button> <span id="p4-iss">0</span> <button onclick="changeValue('p4-iss', 1)">+</button></div></div>
+        <div class="extra-container">
+            <div class="extra-header"><h3>Дополнительное</h3><button onclick="addExtraField()">+</button></div>
+            <div id="extra-fields"></div>
+        </div>
+        <button onclick="generateMessage()">Сгенерировать</button>
+        <div class="message-preview" id="message-preview"></div>
+    </div>
+    <div class="footer">
+        <p id="contact-text">По всем вопросам или в случае неполадок обращаться к <br>Chime: popolekf@amazon.cz <br>Discord: @jlawash</p>
+    </div>
+    <script>
+        function toggleCounter(id) { 
+            let element = document.getElementById(id);
+            let container = document.getElementById(id + '-container');
+            container.style.display = element.classList.contains('active') ? 'none' : 'block';
+            element.classList.toggle('active');
+        }
+        function changeValue(id, delta) { let el = document.getElementById(id); el.textContent = parseInt(el.textContent) + delta; }
+        function addExtraField() { let container = document.getElementById('extra-fields'); let div = document.createElement('div'); div.className = 'extra-item'; let input = document.createElement('input'); input.type = 'number'; let select = document.createElement('select'); ['ISS MIX', 'ISS Non-Sort', 'Cubiscan', 'CONSO', 'Prep', 'Defective'].forEach(t => { let option = document.createElement('option'); option.textContent = t; select.appendChild(option); }); let removeBtn = document.createElement('button'); removeBtn.textContent = 'Удалить'; removeBtn.onclick = () => div.remove(); div.appendChild(input); div.appendChild(select); div.appendChild(removeBtn); container.appendChild(div); }
+        function generateMessage() {
+            let message = '/md\n';
+
+            ['p2', 'p3', 'p4'].forEach(id => {
+                if (document.getElementById(id).classList.contains('active')) {
+                    message += `**${id.toUpperCase()}:**\n`;
+                    message += `- PS - ${document.getElementById(id + '-ps').textContent}\n`;
+                    message += `- ISS - ${document.getElementById(id + '-iss').textContent}\n`;
+                }
+            });
+
+            message += '**UB:**\n';
+
+            // Process extra input fields
+            document.querySelectorAll('.extra-item').forEach(i => {
+                let value = i.querySelector('input').value;
+                let option = i.querySelector('select').value;
+                if (value) message += `- ${value} ${option}\n`;
+            });
+
+            document.getElementById('message-preview').textContent = message;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(message).then(() => alert('Скопировано!'));
+        }
+        function updateLanguage() {
+            let lang = document.getElementById('lang').value;
+            let translations = {
+                ru: "По всем вопросам или в случае неполадок обращаться к",
+                en: "For any questions or issues, contact",
+                cz: "Pro jakékoli dotazy nebo problémy kontaktujte"
+            };
+            document.getElementById('contact-text').innerHTML = `${translations[lang]} <br>Chime: popolekf@amazon.cz <br>Discord: @jlawash`;
+        }
+    </script>
+</body>
+</html>
