@@ -153,7 +153,7 @@
             element.classList.toggle('active');
         }
         function changeValue(id, delta) { let el = document.getElementById(id); el.textContent = parseInt(el.textContent) + delta; }
-        function addExtraField() { let container = document.getElementById('extra-fields'); let div = document.createElement('div'); div.className = 'extra-item'; let input = document.createElement('input'); input.type = 'number'; let select = document.createElement('select'); ['ISS MIX', 'ISS Non-Sort', 'Cubiscan', 'CONSO', 'Prep', 'Defective'].forEach(t => { let option = document.createElement('option'); option.textContent = t; select.appendChild(option); }); let removeBtn = document.createElement('button'); removeBtn.textContent = 'Удалить'; removeBtn.onclick = () => div.remove(); div.appendChild(input); div.appendChild(select); div.appendChild(removeBtn); container.appendChild(div); }
+        function addExtraField() { let container = document.getElementById('extra-fields'); let div = document.createElement('div'); div.className = 'extra-item'; let input = document.createElement('input'); input.type = 'number'; let select = document.createElement('select'); ['ISS MIX', 'ISS Non-Sort', 'Cubiscan', 'TT', 'Defective', 'Defective Recall', 'Defective PS', 'Damage', 'Hazamt'].forEach(t => { let option = document.createElement('option'); option.textContent = t; select.appendChild(option); }); let removeBtn = document.createElement('button'); removeBtn.textContent = 'Удалить'; removeBtn.onclick = () => div.remove(); div.appendChild(input); div.appendChild(select); div.appendChild(removeBtn); container.appendChild(div); }
         function generateMessage() {
             let message = '/md\n';
 
