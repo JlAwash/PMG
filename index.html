@@ -176,14 +176,12 @@
                 if (value) message += `- ${value} ${option}\n`;
             });
 
-            message += '\n';
-            message += '-------------------\n';
-            message += '\n';    
+            message += '-------------------\n';    
             message += '**Omniscan**\n'
 
-                     if (document.getElementById(omni).classList.contains('active')) {
-                    message += `- PS - ${document.getElementById('omni-ps').textContent}\n`;
-                    message += `- ISS - ${document.getElementById('omni-iss').textContent}\n`;
+            if (document.getElementById(omni).classList.contains('active')) {
+                    message += `- PS - ${document.getElementById(omni-ps).textContent}\n`;
+                    message += `- ISS - ${document.getElementById(omni-iss).textContent}\n`;
                 }
 
 
