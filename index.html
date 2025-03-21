@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор</title>
+    <title>SolverTools</title>
     <style>
         body {
             background-color: #1e1e1e;
@@ -138,10 +138,10 @@
         <div id="p4-container" class="counter-container"><div class="counter"><span>PS</span> <button onclick="changeValue('p4-ps', -1)">-</button> <span id="p4-ps">0</span> <button onclick="changeValue('p4-ps', 1)">+</button></div><div class="counter"><span>ISS</span> <button onclick="changeValue('p4-iss', -1)">-</button> <span id="p4-iss">0</span> <button onclick="changeValue('p4-iss', 1)">+</button></div></div>
         <div id="omni-container" class="counter-container"><div class="counter"><span>PS</span> <button onclick="changeValue('omni-ps', -1)">-</button> <span id="omni-ps">0</span> <button onclick="changeValue('omni-ps', 1)">+</button></div><div class="counter"><span>ISS</span> <button onclick="changeValue('omni-iss', -1)">-</button> <span id="omni-iss">0</span> <button onclick="changeValue('omni-iss', 1)">+</button></div></div>
         <div class="extra-container">
-            <div class="extra-header"><h3>Дополнительное</h3><button onclick="addExtraField()">+</button></div>
+            <div class="extra-header"><h3>UB:</h3><button onclick="addExtraField()">+</button></div>
             <div id="extra-fields"></div>
         </div>
-        <button onclick="generateMessage()">Сгенерировать</button>
+        <button onclick="generateMessage()">Generate</button>
         <div class="message-preview" id="message-preview"></div>
     </div>
     <div class="footer">
