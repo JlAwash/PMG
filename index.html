@@ -81,7 +81,7 @@
             margin-top: 5px;
         }
         .message-preview {
-            width: 35%; /* Даем место для предпросмотра */
+            width: 25%; /* Даем место для предпросмотра */
             background: #222;
             color: #ddd;
             padding: 10px;
@@ -160,7 +160,10 @@
             background: #444;
             padding: 10px;
             border-radius: 5px;
+            width: 300px; /* Настроить по необходимости */
+            height: 180px; /* Настроить по необходимости */
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 1em;
         }
         .text-columns {
             display: flex;
@@ -168,7 +171,41 @@
             gap: 10px;
             background: #2f2f2f;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ddd;
+            border-radius: 20px;
+            padding: 5px;
+            position: relative;
+            cursor: pointer;
+            width: 140px;
+            margin: auto;
+            height: 30px;
+            margin-bottom: 1em;
+        }
+        .toggle-button {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+            top: 0;
+            left: 0;
+        }
+        .toggle-text {
+            width: 50%;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            z-index: 2;
         }
     </style>
 </head>
@@ -181,28 +218,19 @@
         </select>
     </div>
     <div class="container-wrapper">
-        <div class="left-containers">
-            <div class="left-container">
-                <h3 style="text-align: center;">Flow</h3>
-                <div class="text-columns">
-                    <div class="text-column" contenteditable="false">
-                        Day<br>1st: 8:20 <br>2nd: 10:15 <br>3rd: 13:45 <br>4th: 17:00
-                    </div>
-                    <div class="text-column" contenteditable="false">
-                        Night<br>1st: 19:30 <br>2nd: 22:00 <br>3rd: 1:00 <br>4th: 4:00
-                    </div>
-                </div>
+        <div class="left-container">
+            <div class="toggle-wrapper" onclick="toggleView()">
+                <div class="toggle-text">Flow</div>
+                <div class="toggle-button" id="toggle-btn"></div>
+                <div class="toggle-text">Break</div>
             </div>
-            <div class="left-container">
-                <h3 style="text-align: center;">Break</h3>
-                <div class="text-columns">
-                    <div class="text-column" contenteditable="false">
-                        Day<br>1st: 9:15 <br>2nd: 11:45-12:15 <br>3rd: 14:30
-                    </div>
-                    <div class="text-column" contenteditable="false">
-                        Night<br>1st: 20:15 <br>2nd: 22:45 <br>3rd: 1:45
-                    </div>
-                </div>
+            <div id="flow" class="text-columns">
+                <div class="text-column">Day<br>1st: 8:20 <br>2nd: 10:15 <br>3rd: 13:45 <br>4th: 17:00</div>
+                <div class="text-column">Night<br>1st: 19:30 <br>2nd: 22:00 <br>3rd: 1:00 <br>4th: 4:00</div>
+            </div>
+            <div id="break" class="text-columns hidden">
+                <div class="text-column">Day<br>1st: 9:15 <br>2nd: 11:45-12:15 <br>3rd: 14:30</div>
+                <div class="text-column">Night<br>1st: 20:15 <br>2nd: 22:45 <br>3rd: 1:45</div>
             </div>
         </div>
     <div class="container">
@@ -309,6 +337,24 @@
         <p id="contact-text">For any questions or issues, contact <br>Chime: popolekf@amazon.cz <br>Discord: @jlawash </p>
     </div>
     <script>
+        let isFlow = true;
+
+        function toggleView() {
+            let flow = document.getElementById("flow");
+            let breakDiv = document.getElementById("break");
+            let toggleBtn = document.getElementById("toggle-btn");
+            
+            if (isFlow) {
+                flow.classList.add("hidden");
+                breakDiv.classList.remove("hidden");
+                toggleBtn.style.transform = "translateX(100%)";
+            } else {
+                flow.classList.remove("hidden");
+                breakDiv.classList.add("hidden");
+                toggleBtn.style.transform = "translateX(0)";
+            }
+            isFlow = !isFlow;
+        }
         function DeleteAllConuters(id) {
             document.getElementById(id + '-ps').textContent = 0;
             document.getElementById(id + '-iss').textContent = 0;
