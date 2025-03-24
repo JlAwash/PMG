@@ -207,13 +207,18 @@
             color: #555;
             z-index: 2;
         }
+        .counter input {
+            width: 50px;
+            text-align: center;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <select id="lang" onchange="updateLanguage()">
-            <option value="ru">Русский</option>
             <option value="en">English</option>
+            <option value="ru">Русский</option>
             <option value="cz">Česky</option>
         </select>
     </div>
@@ -247,13 +252,13 @@
             <div class="counter">
                 <span>PS</span> 
                 <button onclick="changeValue('p2-ps', -1)">-</button> 
-                <span id="p2-ps">0</span> 
+                <input type="number" id="p2-ps" value="0" oninput="validateInput('p2-ps')"> 
                 <button onclick="changeValue('p2-ps', 1)">+</button>
             </div>
             <div class="counter">
                 <span>ISS</span> 
                 <button onclick="changeValue('p2-iss', -1)">-</button> 
-                <span id="p2-iss">0</span> 
+                <input type="number" id="p2-iss" value="0" oninput="validateInput('p2-iss')"> 
                 <button onclick="changeValue('p2-iss', 1)">+</button>
             </div>
             <div class="omniscan" id="p2-omni" onclick="toggleCounter('p2-omni')" style="display: none;">Omniscan</div>
@@ -261,12 +266,12 @@
                 <div class="counter">
                     <span>PS</span> 
                     <button onclick="changeValue('p2-omni-ps', -1)">-</button> 
-                    <span id="p2-omni-ps">0</span> 
+                    <input type="number" id="p2-omni-ps" value="0" oninput="validateInput('p2-omni-ps')">
                     <button onclick="changeValue('p2-omni-ps', 1)">+</button>
                 </div><div class="counter">
                     <span>ISS</span> 
                     <button onclick="changeValue('p2-omni-iss', -1)">-</button> 
-                    <span id="p2-omni-iss">0</span> 
+                    <input type="number" id="p2-omni-iss" value="0" oninput="validateInput('p2-omni-iss')"> 
                     <button onclick="changeValue('p2-omni-iss', 1)">+</button>
                 </div>
             </div>
@@ -279,13 +284,14 @@
             <div class="counter">
                 <span>PS</span> 
                 <button onclick="changeValue('p3-ps', -1)">-</button> 
-                <span id="p3-ps">0</span> 
+                <input type="number" id="p3-ps" value="0" oninput="validateInput('p3-ps')"> 
                 <button onclick="changeValue('p3-ps', 1)">+</button>
             </div>
             <div class="counter">
                 <span>ISS</span> 
                 <button onclick="changeValue('p3-iss', -1)">-</button> 
-                <span id="p3-iss">0</span> <button onclick="changeValue('p3-iss', 1)">+</button>
+                <input type="number" id="p3-iss" value="0" oninput="validateInput('p3-iss')"> 
+                <button onclick="changeValue('p3-iss', 1)">+</button>
             </div>
         </div>
         <div id="p4-container" class="counter-container">
@@ -296,12 +302,12 @@
             <div class="counter">
                 <span>PS</span> 
                 <button onclick="changeValue('p4-ps', -1)">-</button> 
-                <span id="p4-ps">0</span> 
+                <input type="number" id="p4-ps" value="0" oninput="validateInput('p4-ps')"> 
                 <button onclick="changeValue('p4-ps', 1)">+</button>
             </div><div class="counter">
                 <span>ISS</span> 
                 <button onclick="changeValue('p4-iss', -1)">-</button> 
-                <span id="p4-iss">0</span> 
+                <input type="number" id="p4-iss" value="0" oninput="validateInput('p4-iss')">
                 <button onclick="changeValue('p4-iss', 1)">+</button>
             </div>
             <div class="omniscan" id="p4-omni" onclick="toggleCounter('p4-omni')" style="display: none;">Omniscan</div>
@@ -309,12 +315,12 @@
                 <div class="counter">
                     <span>PS</span> 
                     <button onclick="changeValue('p4-omni-ps', -1)">-</button> 
-                    <span id="p4-omni-ps">0</span> 
+                    <input type="number" id="p4-omni-ps" value="0" oninput="validateInput('p4-omni-ps')"> 
                     <button onclick="changeValue('p4-omni-ps', 1)">+</button>
                 </div><div class="counter">
                     <span>ISS</span> 
                     <button onclick="changeValue('p4-omni-iss', -1)">-</button> 
-                    <span id="p4-omni-iss">0</span> 
+                    <input type="number" id="p4-omni-iss" value="0" oninput="validateInput('p4-omni-iss')">
                     <button onclick="changeValue('p4-omni-iss', 1)">+</button>
                 </div>
             </div>
@@ -335,7 +341,7 @@
     </div>
     <div class="footer">
         <p id="contact-text">For any questions or issues, contact <br>Chime: popolekf@amazon.cz <br>Discord: @jlawash </p>
-    </div>
+    </div> 
     <script>
         let isFlow = true;
 
@@ -356,12 +362,10 @@
             isFlow = !isFlow;
         }
         function DeleteAllConuters(id) {
-            document.getElementById(id + '-ps').textContent = 0;
-            document.getElementById(id + '-iss').textContent = 0;
-            if (document.getElementById(id + '-omni-ps')) {
-                document.getElementById(id + '-omni-ps').textContent = 0;
-                document.getElementById(id + '-omni-iss').textContent = 0;
-            }
+            document.getElementById(id + '-ps').value = 0;
+            document.getElementById(id + '-iss').value = 0;
+            document.getElementById(id + '-omni-ps').value = 0;
+            document.getElementById(id + '-omni-iss').value = 0;
         }
         function toggleCounter(id) { 
             let element = document.getElementById(id);
@@ -377,10 +381,10 @@
             document.getElementById('p4-omni').style.display = 
                 document.getElementById('p4').classList.contains('active') ? 'block' : 'none';
         }
-        function changeValue(id, delta) { 
-            let el = document.getElementById(id); 
-            el.textContent = parseInt(el.textContent) + delta; 
-        }
+        function changeValue(id, delta) {
+            let input = document.getElementById(id);
+            input.value = parseInt(input.value || 0) + delta;
+        } 
         function addExtraField() { 
             let container = document.getElementById('extra-fields'); 
             let div = document.createElement('div'); 
@@ -406,8 +410,8 @@
             ['p2', 'p3', 'p4'].forEach(id => {
                 if (document.getElementById(id).classList.contains('active')) {
                     message += `**${id.toUpperCase()}:**\n`;
-                    message += `- PS - ${document.getElementById(id + '-ps').textContent}\n`;
-                    message += `- ISS - ${document.getElementById(id + '-iss').textContent}\n`;
+                    message += `- PS - ${document.getElementById(id + '-ps').value}\n`;
+                    message += `- ISS - ${document.getElementById(id + '-iss').value }\n`;
                 }
             });
 
@@ -425,16 +429,16 @@
                     message += '-------------------\n';  
                     message += '\n';  
                     message += '**Omniscan:**\n'
-                    message += `- PS - ${document.getElementById('p2-omni-ps').textContent}\n`;
-                    message += `- ISS - ${document.getElementById('p2-omni-iss').textContent}\n`;
+                    message += `- PS - ${document.getElementById('p2-omni-ps').value}\n`;
+                    message += `- ISS - ${document.getElementById('p2-omni-iss').value}\n`;
                 }
                 else if (document.getElementById('p4-omni').classList.contains('active') && document.getElementById('p4').classList.contains('active')) {
                     message += '\n';
                     message += '-------------------\n';  
                     message += '\n';  
                     message += '**Omniscan:**\n'
-                    message += `- PS - ${document.getElementById('p4-omni-ps').textContent}\n`;
-                    message += `- ISS - ${document.getElementById('p4-omni-iss').textContent}\n`;
+                    message += `- PS - ${document.getElementById('p4-omni-ps').value}\n`;
+                    message += `- ISS - ${document.getElementById('p4-omni-iss').value}\n`;
                 };
 
 
@@ -454,6 +458,12 @@
         }
         function DeleteAllExstras() {
             document.getElementById('extra-fields').innerHTML = '';
+        }
+        function validateInput(id) {
+            let input = document.getElementById(id);
+            if (isNaN(input.value) || input.value === "") {
+                input.value = 0;
+            }
         }
     </script>
 </body>
