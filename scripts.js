@@ -47,7 +47,7 @@ function addExtraField() {
     let input = document.createElement('input'); 
     input.type = 'number'; 
     let select = document.createElement('select'); 
-    ['ISS MIX', 'ISS Non-Sort', 'Cubiscan', 'TT', 'Defective', 'Defective Recall', 'Defective PS', 'CONSO SIOC', 'Damage', 'Hazamt'].forEach(t => { 
+    ['ISS MIX', 'ISS Non-Sort', 'Cubiscan', 'TT', 'Prep', 'Defective', 'Defective Recall', 'Defective PS', 'CONSO', 'Damage', 'Hazamt', 'Potravina/Krmivo', 'Likvidace'].forEach(t => { 
         let option = document.createElement('option'); 
         option.textContent = t; select.appendChild(option); 
     }); 
