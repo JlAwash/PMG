@@ -1,0 +1,226 @@
+// ==UserScript==
+// @name         Price Checker – Alternative Approach
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Собирает SKU, начинающиеся на ZZ, с одной страницы и запрашивает цену с другого сайта через fetch HTML как текст с дополнительной задержкой
+// @match        https://afttransshipmenthub-eu.aka.amazon.com/BRQ2/*
+// @grant        GM_xmlhttpRequest
+// @connect      fcresearch-eu.aka.amazon.com
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // Ключевые слова для поиска цены (приводим все к нижнему регистру)
+    const PRICE_KEYWORDS = [
+        'ceníková cena',
+        'cena',
+        'price'
+    ];
+
+    // Задержка перед сбором SKU (чтобы страница успела загрузить динамический контент)
+    const LOAD_DELAY = 5000;
+
+    // Селекторы для SKU и количества – подберите их по реальной структуре страницы
+    const SKU_SELECTORS = ['.FcSku', '.item-fcSku a', '.skuValue'];
+    const QTY_SELECTORS = ['.item-quantity', '.qtyValue'];
+
+    // Функция ожидания указанного времени
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Функция для поиска элементов по массиву селекторов
+    function findAllElements(selectors) {
+        let elems = [];
+        selectors.forEach(sel => {
+            let found = document.querySelectorAll(sel);
+            console.log(DEBUG: По селектору "${sel}" найдено ${found.length} элементов);
+            found.forEach(el => elems.push(el));
+        });
+        return elems;
+    }
+
+    // Главная функция сбора SKU, количества и подсчёта цены
+    async function collectAndShowSKUs() {
+        console.log("DEBUG: Ждем загрузки контента...", LOAD_DELAY, "мс");
+        await delay(LOAD_DELAY);
+
+        const skuElements = findAllElements(SKU_SELECTORS);
+        console.log("DEBUG: Всего найдено элементов SKU:", skuElements.length);
+
+        let skuMap = new Map(); // {SKU: quantity}
+
+        skuElements.forEach((el, idx) => {
+            let rawSKU = el.textContent.trim();
+            console.log(DEBUG: [${idx+1}] SKU = "${rawSKU}");
+
+            // Ищем родительский элемент – попробуйте разные классы, если необходимо
+            let parent = el.closest('.row.child-container-row, .scannable-item, .item-container, .lineItem');
+            if (!parent) {
+                console.warn(DEBUG: Для SKU "${rawSKU}" не найден родительский контейнер. Родитель:, el.parentNode ? el.parentNode.outerHTML : "null");
+                return;
+            }
+            let qtyElem = null;
+            for (let sel of QTY_SELECTORS) {
+                qtyElem = parent.querySelector(sel);
+                if (qtyElem) break;
+            }
+            if (!qtyElem) {
+                console.warn(DEBUG: Для SKU "${rawSKU}" не найден элемент с количеством.);
+                return;
+            }
+            let qtyStr = qtyElem.textContent.trim();
+            let qty = parseInt(qtyStr.replace(/\D/g, '')) || 0;
+            console.log(DEBUG: SKU "${rawSKU}" имеет количество = "${qtyStr}" (parsed: ${qty}));
+
+            // Фильтруем: оставляем только SKU, начинающиеся с "ZZ" и qty > 0
+            if (rawSKU.startsWith("ZZ") && qty > 0) {
+                if (skuMap.has(rawSKU)) {
+                    skuMap.set(rawSKU, skuMap.get(rawSKU) + qty);
+                } else {
+                    skuMap.set(rawSKU, qty);
+                }
+            } else {
+                console.log(DEBUG: SKU "${rawSKU}" не удовлетворяет условиям (начинается с "ZZ" и qty > 0).);
+            }
+        });
+
+        if (skuMap.size === 0) {
+            alert("Не найдено подходящих SKU (начинающиеся с 'ZZ' и количество > 0). Проверьте консоль для отладки.");
+            return;
+        }
+        console.log("DEBUG: Итоговое количество подходящих SKU:", skuMap.size);
+
+// Создаем или очищаем контейнер для вывода результатов
+        let container = document.getElementById('price-results');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'price-results';
+            container.style.position = 'relative';
+            container.style.width = '100%';
+            container.style.marginTop = '40px';
+            container.style.backgroundColor = '#f9f9f9';
+            container.style.borderTop = '2px solid #333';
+            container.style.padding = '20px';
+            container.style.zIndex = '1000';
+            document.body.appendChild(container);
+        }
+        container.innerHTML = <p>Загружаем цены, подождите...</p>;
+
+        let total = 0;
+        let tableRows = '';
+
+        for (const [sku, qty] of skuMap.entries()) {
+            const price = await fetchPriceForSKU(sku);
+            const sum = price * qty;
+            total += sum;
+            console.log(DEBUG: SKU="${sku}" qty=${qty}, price=${price}, sum=${sum});
+
+            tableRows += 
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ccc;">${sku}</td>
+                    <td style="padding: 8px; border: 1px solid #ccc; text-align: center;">${qty}</td>
+                    <td style="padding: 8px; border: 1px solid #ccc; text-align: center;">${price.toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ccc; text-align: center;">${sum.toFixed(2)}</td>
+                </tr>;
+        }
+
+        let tableHTML = 
+            <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+                <thead>
+                    <tr style="background-color: #333; color: white;">
+                        <th style="padding: 8px; border: 1px solid #ccc;">SKU</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Количество</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Цена за 1</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                    <tr style="font-weight: bold; background-color: #eee;">
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: right;">Итого:</td>
+                        <td style="padding: 8px; border: 1px solid #ccc; text-align: center;">${total.toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>;
+        container.innerHTML = tableHTML;
+        console.log("DEBUG: Итоговая таблица сформирована, Total =", total.toFixed(2));
+    }
+
+    // Функция запроса цены: запрашиваем HTML как текст, далее парсим с задержкой
+    function fetchPriceForSKU(sku) {
+        return new Promise((resolve) => {
+            const url = https://fcresearch-eu.aka.amazon.com/BRQ2/results?s=${sku};
+            console.log(DEBUG: Запрашиваем цену для SKU="${sku}" по URL: ${url});
+
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: url,
+                responseType: "text",  // получаем HTML как текст
+                onload: function(response) {
+                    // Добавляем небольшую задержку внутри onload, чтобы, возможно, данные обновились
+                    setTimeout(() => {
+                        let parser = new DOMParser();
+                        let doc = parser.parseFromString(response.responseText, "text/html");
+                        let price = parsePriceFromDoc(doc);
+                        console.log(DEBUG: Получена цена для SKU="${sku}" = ${price});
+                        resolve(price);
+                    }, 2000); // задержка 2 секунды
+                },
+                onerror: function(err) {
+                    console.error("ERROR: Не удалось получить цену для SKU=", sku, err);
+                    resolve(0);
+                }
+            });
+        });
+    }
+
+// Функция парсинга цены: ищем строки с ключевыми словами и пытаемся извлечь цену
+    function parsePriceFromDoc(doc) {
+        let priceValue = 0;
+        let rows = doc.querySelectorAll("tr");
+        console.log("DEBUG: В документе найдено строк (tr):", rows.length);
+        for (let row of rows) {
+            let rowText = row.textContent.toLowerCase();
+            for (let keyword of PRICE_KEYWORDS) {
+                if (rowText.includes(keyword)) {
+                    let cells = row.querySelectorAll("td");
+                    if (cells.length >= 2) {
+                        let raw = cells[1].textContent.trim();
+                        console.log(DEBUG: Найдено ключевое слово "${keyword}" → rawPrice="${raw}");
+                        raw = raw.replace(/[A-Za-z]/g, "").replace(/[^\d.,]/g, "").replace(",", ".");
+                        let parsed = parseFloat(raw);
+                        if (!isNaN(parsed)) {
+                            priceValue = parsed;
+                        }
+                    }
+                    return priceValue;
+                }
+            }
+        }
+        return priceValue;
+    }
+
+    // Функция для добавления кнопки запуска на странице
+    function createButton() {
+        let btnContainer = document.querySelector(".container-fluid");
+        if (!btnContainer) {
+            console.warn("WARNING: Не найден контейнер .container-fluid для размещения кнопки");
+            return;
+        }
+        let btn = document.createElement('button');
+        btn.textContent = "DEBUG: Собрать SKU";
+        btn.style.marginTop = "10px";
+        btn.style.padding = "8px 16px";
+        btn.style.backgroundColor = "#e60033";
+        btn.style.color = "white";
+        btn.style.border = "none";
+        btn.style.borderRadius = "4px";
+        btn.style.cursor = "pointer";
+        btn.onclick = collectAndShowSKUs;
+        btnContainer.appendChild(btn);
+    }
+
+    createButton();
+})();
